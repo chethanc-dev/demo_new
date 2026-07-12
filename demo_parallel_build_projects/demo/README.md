@@ -1,1 +1,0 @@
-Sample Maven + CMake parallel Jenkins project.
