@@ -6,11 +6,9 @@ pipeline {
             parallel {
 
                 stage('Maven') {
-                    /* Assumes you have a Maven installation named 'Maven 3' 
-                       configured under Manage Jenkins -> Tools.
-                    */
+                    /* Fixed name to match your exact Jenkins configuration */
                     tools {
-                        maven 'Maven 3' 
+                        maven 'Maven' 
                     }
                     steps {
                         dir('vehicle-parking') {
