@@ -1,0 +1,72 @@
+pipeline {
+
+    agent any
+
+    options {
+        timestamps()
+        timeout(time: 1, unit: 'HOURS')
+    }
+
+    tools {
+        maven 'Maven'
+    }
+
+    stages {
+
+        stage('Start') {
+            steps {
+                echo "=========================================="
+                echo "Build Started at: ${new Date()}"
+                echo "=========================================="
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                sh 'cd vehicle-parking && mvn clean compile'
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh 'cd vehicle-parking && mvn test -Dtest=**/*Test.java'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'cd vehicle-parking && mvn package'
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'vehicle-parking/target/*.jar'
+                archiveArtifacts artifacts: 'vehicle-parking/target/surefire-reports/**', allowEmptyArchive: true
+            }
+        }
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'vehicle-parking/target/surefire-reports/*.xml'
+            echo "=========================================="
+            echo "Unit Test Results Processed and Archived"
+            echo "=========================================="
+            echo "Build Finished at: ${new Date()}"
+            echo "=========================================="
+        }
+        success {
+            echo "Build SUCCESS"
+        }
+        failure {
+            echo "Build FAILED"
+        }
+    }
+}
